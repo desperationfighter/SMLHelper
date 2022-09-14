@@ -401,7 +401,10 @@ namespace SMLHelper.V2.Patchers
         {
             var instanceCurrent = __instance._current ?? default;
             if (string.IsNullOrEmpty(instanceCurrent.sound)  || !PlayedChannels.TryGetValue(instanceCurrent.sound, out var channel)) return true;
-            if (!SoundQueue.GetIsStartingOrPlaying(__instance.eventInstance)) return true;
+            
+            // if (!SoundQueue.GetIsStartingOrPlaying(__instance.eventInstance)) return true;
+            PLAYBACK_STATE playbackStatetocheck = SoundQueue.GetPlaybackState(__instance.eventInstance);
+            if( !(playbackStatetocheck == PLAYBACK_STATE.PLAYING || playbackStatetocheck == PLAYBACK_STATE.STARTING || playbackStatetocheck == PLAYBACK_STATE.SUSTAINING) ) return true;
 
             ATTRIBUTES_3D attributes = Player.main.transform.To3DAttributes();
             channel.set3DAttributes(ref attributes.position, ref attributes.velocity);
@@ -412,6 +415,7 @@ namespace SMLHelper.V2.Patchers
             return false;
         }
 
+        /*
         [HarmonyPatch(typeof(SoundQueue), nameof(SoundQueue.GetIsStartingOrPlaying))]
         [HarmonyPrefix]
         public static bool SoundQueue_GetIsStartingOrPlaying_Prefix( ref bool __result)
@@ -423,6 +427,7 @@ namespace SMLHelper.V2.Patchers
             __result = __result && result == RESULT.OK;
             return false;
         }
+        */
         
         [HarmonyPatch(typeof(SoundQueue), nameof(SoundQueue.SetPosition))]
         [HarmonyPrefix]
